@@ -3,18 +3,6 @@ from datetime import datetime
 import time
 
 
-def data():
-    text = str(datetime.now().date()).split("-")
-    text[0] = str(datetime.now().date().day)
-    text[1] = str(datetime.now().date().month)
-    if len(text[1]) == 1:
-        text[1] = "0" + text[1]
-    text[2] = str(datetime.now().date().year)
-    text = " ".join(text).replace(" ", "/") + " " + str(datetime.now().time().replace(microsecond=00))
-    return text
-
-
-
 banco = "Banco Lone"  # Aqui seu dinheiro neinguém come!
 option_1 = "Digite [d] para depositar"
 option_2 = "Digite [s] para sacar"
@@ -62,6 +50,7 @@ menu_apenas_com_extrato = """
     #############################
 """ % (nome_usuario, banco, option_3, option_4, "." * 29)
 
+
 def depositar_dinheiro(saldo):
     while True:
         valor_deposito = int(input("Qual valor você deseja depositar?"))
@@ -100,9 +89,10 @@ def sacar_dinheiro(saldo, /):
 
 def escrever_extrato(transacao, valores: tuple, *, valor_sacar=0) -> None:
     saldo_anterior, saldo_atual = valores
-    dic = {"saque": valor_sacar, "data": data(), "saldo_anterior": round(saldo_anterior),
+    data_e_hora = datetime.now().strftime("%d/%m/%Y às %H:%M")
+    dic = {"saque": valor_sacar, "data": data_e_hora, "saldo_anterior": round(saldo_anterior),
            "saldo_atual": round(saldo_atual)} if transacao == "saque" else {
-        "deposito": int(saldo_atual - saldo_anterior), "data": data(), "saldo_anterior": round(saldo_anterior),
+        "deposito": int(saldo_atual - saldo_anterior), "data": data_e_hora, "saldo_anterior": round(saldo_anterior),
         "saldo_atual": round(saldo_atual)}
     extrato_texto = "saque de R${saque}.00 realizado no dia {data}, seu saldo foi de R${saldo_anterior}.00 para R${saldo_atual}.00".format(
         **dic) if transacao == "saque" else "deposito de R${deposito}.00 realizado no dia {data}, seu saldo foi de R${saldo_anterior}.00 para R${saldo_atual}.00".format(
