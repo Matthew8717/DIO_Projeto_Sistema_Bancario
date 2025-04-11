@@ -14,6 +14,7 @@ def data():
     return text
 
 
+
 banco = "Banco Lone"  # Aqui seu dinheiro neinguém come!
 option_1 = "Digite [d] para depositar"
 option_2 = "Digite [s] para sacar"
@@ -26,8 +27,10 @@ option_1, option_2, option_3, option_4 = option_1.lstrip(), option_2.lstrip(), o
 
 nome_usuario = input("Qual é o seu nome?").strip().title()
 nome_usuario = "Olá {nome}, seja bem vindo!".format(nome=nome_usuario)
-saldo = 1248.40
+saldo = 10.0
 limite_saque = 500
+limite_transacoes_diarias = 10
+qtd_transacoes_do_dia = 0
 limite_saque_diario = 3
 qtd_saques_do_dia = 0
 extrato = []
@@ -47,6 +50,17 @@ menu = """
 
 """ % (nome_usuario, banco, option_1, option_2, option_3, option_4, "." * 29)
 
+menu_apenas_com_extrato = """
+    %s \n
+    #############################
+    %s
+    
+    %s
+    %s
+    
+    %s
+    #############################
+""" % (nome_usuario, banco, option_3, option_4, "." * 29)
 
 def depositar_dinheiro(saldo):
     while True:
@@ -128,10 +142,17 @@ def sair_do_programa_ou_voltar_ao_menu(mostrar_opcao__extrato=True):
 
 
 while True:
-    escolha = input(menu)
+    limite_transacoes_diarias_atingido = qtd_transacoes_do_dia >= limite_transacoes_diarias
+    if limite_transacoes_diarias_atingido:
+        print("Desculpe, mas você já ultrapassou o limite de transações diárias de hoje, volte novamente amanhã!")
+        escolha = input(menu_apenas_com_extrato)
+    else:
+        escolha = input(menu)
 
-    if escolha == "d":
+    if escolha == "d" and not limite_transacoes_diarias_atingido:
         saldo = depositar_dinheiro(saldo)
+        qtd_transacoes_do_dia += 1
+
         escolha_2 = sair_do_programa_ou_voltar_ao_menu()
         if escolha_2 == "q":
             continue
@@ -140,13 +161,15 @@ while True:
         else:
             escolha = "x"
 
-    elif escolha == "s":
+    elif escolha == "s" and not limite_transacoes_diarias_atingido:
         if qtd_saques_do_dia >= limite_saque_diario:
             print("Limite de saque diario atingido, por favor, volte amanhã!")
             continue
 
         saldo = sacar_dinheiro(saldo)
         qtd_saques_do_dia += 1
+        qtd_transacoes_do_dia += 1
+
         escolha_2 = sair_do_programa_ou_voltar_ao_menu()
         if escolha_2 == "q":
             continue
@@ -183,4 +206,3 @@ while True:
 
     else:
         print("Opção invalida, por favor escolha novamente")
-        continue
