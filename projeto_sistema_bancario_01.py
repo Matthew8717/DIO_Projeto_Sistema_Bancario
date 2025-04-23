@@ -51,7 +51,7 @@ menu_apenas_com_extrato = """
 """ % (nome_usuario, banco, option_3, option_4, "." * 29)
 
 
-def depositar_dinheiro(saldo):
+def depositar_dinheiro(** saldo):
     while True:
         valor_deposito = int(input("Qual valor você deseja depositar?"))
 
@@ -83,11 +83,11 @@ def sacar_dinheiro(saldo, /):
             saldo_anterior = saldo
             saldo -= valor_sacar
             print("Saque de R$%d.00 concluido com sucesso!" % valor_sacar)
-            escrever_extrato("saque", (saldo_anterior, saldo), valor_sacar=valor_sacar)
+            escrever_extrato("saque", valores=(saldo_anterior, saldo), valor_sacar=valor_sacar)
             return saldo
 
 
-def escrever_extrato(transacao, valores: tuple, *, valor_sacar=0) -> None:
+def escrever_extrato(transacao, /, valores: tuple, *, valor_sacar=0) -> None:
     saldo_anterior, saldo_atual = valores
     data_e_hora = datetime.now().strftime("%d/%m/%Y às %H:%M")
     dic = {"saque": valor_sacar, "data": data_e_hora, "saldo_anterior": round(saldo_anterior),
@@ -140,7 +140,7 @@ while True:
         escolha = input(menu)
 
     if escolha == "d" and not limite_transacoes_diarias_atingido:
-        saldo = depositar_dinheiro(saldo)
+        saldo = depositar_dinheiro(saldo=saldo)
         qtd_transacoes_do_dia += 1
 
         escolha_2 = sair_do_programa_ou_voltar_ao_menu()
