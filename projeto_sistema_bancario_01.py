@@ -2,7 +2,6 @@ import sys
 from datetime import datetime
 import time
 
-
 banco = "Banco Lone"  # Aqui seu dinheiro neinguém come!
 option_1 = "Digite [d] para depositar"
 option_2 = "Digite [s] para sacar"
@@ -22,6 +21,8 @@ qtd_transacoes_do_dia = 0
 limite_saque_diario = 3
 qtd_saques_do_dia = 0
 extrato = []
+usuarios: dict[str, dict] = {"USER1": {"nome": "Irineu", "cpf": "12345678900", "endereco": "Rua do Escorrega Lavei Um", "telefone": 1212121, "agencia": "0001", "contas": ["0001"]},
+                             "USER2": {"nome": "P", "cpf": "00987654321", "endereco": "Rua Lopca", "telefone": 2121212}}
 
 menu = """
     %s \n
@@ -42,16 +43,16 @@ menu_apenas_com_extrato = """
     %s \n
     #############################
     %s
-    
+
     %s
     %s
-    
+
     %s
     #############################
 """ % (nome_usuario, banco, option_3, option_4, "." * 29)
 
 
-def depositar_dinheiro(** saldo):
+def depositar_dinheiro(**saldo):
     while True:
         valor_deposito = int(input("Qual valor você deseja depositar?"))
 
@@ -131,7 +132,81 @@ def sair_do_programa_ou_voltar_ao_menu(mostrar_opcao__extrato=True):
             continue
 
 
+def criar_usuario(usuarios) -> dict:
+    novo_usuario: str = "USER" + str(len(usuarios) + 1)
+
+    usuarios.update({novo_usuario: {}})  # Cria uma nova chave/usuario com um dict vazio dentro de usuarios
+    usuarios[novo_usuario] = usuarios[novo_usuario].fromkeys(
+        ["nome", "cpf", "endereco", "telefone"])  # Cria valores para aquele dict vazio
+
+    usuarios[novo_usuario]["nome"] = input("Qual é o seu nome?")
+    usuarios[novo_usuario]["cpf"] = str(input("Qual é o seu número de CPF?"))
+    usuarios[novo_usuario]["endereco"] = input("Qual é o seu endereço?")
+    usuarios[novo_usuario]["telefone"] = int(input("Qual é o seu número de telefone?"))
+
+    cpfs = [usuario.get("cpf") for usuario in usuarios.values()]  # Adiciona todos os cpfs de todos os usuarios dentro da lista "cpfs"
+    print(cpfs)
+    if cpfs.count(usuarios[novo_usuario]["cpf"]) > 1:  # Verifica se já existe uma conta com o novo CPF
+        print("Esse CPF já está cadastrado no nosso banco")
+        usuarios.pop(novo_usuario)
+    else:
+        print("Usuario criado com sucesso!")
+
+    return usuarios
+
+
+def criar_conta_corrente():
+    nomes_e_cpfs_de_usuarios = ""
+    i = 1
+    users = {}
+    for usuario_chave, usuario_valores in usuarios.items():  # Ex: usuario_chave = "USER2", usuario_valores = {nome: "name", cpf: 123...}
+        nome = usuario_valores.get("nome").upper()
+        cpf = usuario_valores.get("cpf")
+        cpf = "***." + cpf[3:-5] + ".***-" + cpf[-2:]
+        nomes_e_cpfs_de_usuarios += f"""
+    Digite {i} para:
+
+    -Nome: {nome}
+    -CPF:  {cpf}
+
+    -----------------------------"""
+        users.update({i: {usuario_chave: usuario_valores}})
+        i += 1
+
+    texto = f"""
+    --Para qual usuario você quer criar uma conta corrente?
+    {nomes_e_cpfs_de_usuarios} 
+
+    Digite apenas o número desejável
+    """
+
+    escolhido = int(input(texto))
+
+    users = users[escolhido]
+    user_escolhido = ""
+    for chave, valor in users.items():
+        user_escolhido = usuarios[chave]   # A chave aqui seria o usuario escolhido, ex: "USER2"
+
+    if user_escolhido.get("agencia") is None:   # Se não encontrar um agencia dentro do user_escolhido, criar uma
+        user_escolhido.update({"agencia": "0001"})
+
+    if user_escolhido.get("contas") is not None:
+        if len(user_escolhido["contas"]) > 998:
+            conta = ""
+        elif len(user_escolhido["contas"]) > 98:
+            conta = "00"
+        elif len(user_escolhido["contas"]) > 8:
+            conta = "00"
+        else:
+            conta = "000"
+        user_escolhido["contas"].append(conta + str(len(user_escolhido["contas"]) + 1))
+    else:
+        user_escolhido.update({"contas": ["0001"]})
+
+
 while True:
+    print(usuarios)
+
     limite_transacoes_diarias_atingido = qtd_transacoes_do_dia >= limite_transacoes_diarias
     if limite_transacoes_diarias_atingido:
         print("Desculpe, mas você já ultrapassou o limite de transações diárias de hoje, volte novamente amanhã!")
@@ -184,6 +259,12 @@ while True:
             continue
         else:
             escolha = "x"
+
+    if escolha == "cu":
+        criar_usuario(usuarios)
+
+    if escolha == "cc":
+        criar_conta_corrente()
 
     if escolha == "x":
         print("Fechando o sistema.")
