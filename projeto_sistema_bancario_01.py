@@ -52,7 +52,7 @@ menu_apenas_com_extrato = """
 """ % (nome_usuario, banco, option_3, option_4, "." * 29)
 
 
-def depositar_dinheiro(**saldo):
+def depositar_dinheiro(saldo, /):
     while True:
         valor_deposito = int(input("Qual valor você deseja depositar?"))
 
@@ -67,7 +67,7 @@ def depositar_dinheiro(**saldo):
         return saldo
 
 
-def sacar_dinheiro(saldo, /):
+def sacar_dinheiro(*, saldo):
     while True:
         valor_sacar = int(input("Qual valor você deseja sacar?"))
 
@@ -215,7 +215,7 @@ while True:
         escolha = input(menu)
 
     if escolha == "d" and not limite_transacoes_diarias_atingido:
-        saldo = depositar_dinheiro(saldo=saldo)
+        saldo = depositar_dinheiro(saldo)
         qtd_transacoes_do_dia += 1
 
         escolha_2 = sair_do_programa_ou_voltar_ao_menu()
@@ -231,7 +231,7 @@ while True:
             print("Limite de saque diario atingido, por favor, volte amanhã!")
             continue
 
-        saldo = sacar_dinheiro(saldo)
+        saldo = sacar_dinheiro(saldo=saldo)
         qtd_saques_do_dia += 1
         qtd_transacoes_do_dia += 1
 
